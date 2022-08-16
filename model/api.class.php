@@ -7,7 +7,7 @@ class cl_api
         $this->headers = [
             "Accept: application/vnd.github+json",
             "User-Agent: Coding",
-            "Authorization: token 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"
+            "Authorization: token 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"
         ];
     }
 
@@ -42,11 +42,15 @@ class cl_api
             ";
         foreach ($data_reponse AS $data){
             foreach ($data->labels AS $sub_data){
-                $description = (isset($sub_data->description)) ? $sub_data->description : '';
-                if (str_starts_with($sub_data->name, 'C')) $client = str_replace("C: ", "", $sub_data->name);
-                if (str_starts_with($sub_data->name, 'P')) $priority = str_replace("P: ", "", $sub_data->name);
-                if (str_starts_with($sub_data->name, 'T')) $type = str_replace("T: ", "", $sub_data->name);
+                $descriptions = $sub_data->description;
+                if (str_starts_with($sub_data->name, 'C')) $clients = str_replace("C: ", "", $sub_data->name);
+                if (str_starts_with($sub_data->name, 'P')) $priorities = str_replace("P: ", "", $sub_data->name);
+                if (str_starts_with($sub_data->name, 'T')) $types = str_replace("T: ", "", $sub_data->name);
             }
+            $description = (isset($descriptions)) ? $descriptions : '';
+            $client = (isset($clients)) ? $clients : '';
+            $priority = (isset($priorities)) ? $priorities : '';
+            $type = (isset($types)) ? $types : '';
             $number = (isset($data->number)) ? $data->number : '';
             $title = (isset($data->title)) ? $data->title : '';
             $assignee = (isset($data->assigne)) ? $data->assignee : '';
@@ -69,26 +73,35 @@ class cl_api
         return $display_data;
     }
 
-    public function add_api_data(){
-        $curl = curl_init();
+    public function add_api_data($number, $title, $description, $client, $priority, $type, $assignee, $status){
+        $data = array(
+            "number" => $number,
+            "title" => $title,
+            "labels" => array(
+                "description" => $description,
+                "client" => $client,
+                "priority" => $priority,
+                "type" => $type,
+            ),
+            "assignee" => $assignee,
+            "status" => $status
+        );
 
-        curl_setopt_array($curl, [
-            CURLOPT_HTTPHEADER => $this->headers,
-            CURLOPT_RETURNTRANSFER => true
-        ]);
+        $ch = curl_init();
 
-        # CURL INIT
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_URL, $this->url);
 
-        curl_setopt($curl, CURLOPT_URL, $this->url);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($_POST));
+        $result = curl_exec($ch);
 
-        $response = curl_exec($curl);
+        var_dump($result);
 
-        curl_close($curl);
-
-        $data = json_decode($response, true);
-
-        var_dump($data);
+        curl_close($ch);
 
     }
 }
