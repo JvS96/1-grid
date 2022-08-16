@@ -4,6 +4,11 @@ class cl_api
 {
     public function __construct(){
         $this->url = 'https://api.github.com/repos/1-grid/GitIntegration/issues';
+        $this->headers = [
+            "Accept: application/vnd.github+json",
+            "User-Agent: Coding",
+            "Authorization: token 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"
+        ];
     }
 
     public function get_api_data(){
@@ -22,9 +27,9 @@ class cl_api
 
         $data_reponse = json_decode($api_reponse);
 
-        $display_data = "
-            <table>
-                <tr>
+        $display_data = "            
+            <table class='table table-striped'>
+                <tr class='thead-dark'>
                     <th>Number</th>
                     <th>Title</th>
                     <th>Description</th>
@@ -65,6 +70,25 @@ class cl_api
     }
 
     public function add_api_data(){
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_HTTPHEADER => $this->headers,
+            CURLOPT_RETURNTRANSFER => true
+        ]);
+
+        # CURL INIT
+
+        curl_setopt($curl, CURLOPT_URL, $this->url);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($_POST));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        $data = json_decode($response, true);
+
+        var_dump($data);
 
     }
 }

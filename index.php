@@ -1,14 +1,38 @@
 <?php
 #includes
-require_once('model/api.class.php');
+include 'header.html';
+include 'model/api.class.php';
 
 #models
 $cl_api = new cl_api();
 
+#init
 $get_api_class_data = $cl_api->get_api_data();
-echo $get_api_class_data;
 
-if(isset($_REQUEST['add'])){
-    //Module to add new issue then point to class to add actual data.
-    $add_api_class_data = $cl_api->add_api_data();
-}
+?>
+<html>
+    <body>
+        <div class='row' style="padding: 2%;">
+            <div class='col-md-12'>
+                <!-- Open The Modal -->
+                <button id="list_issue" class="alert alert-success">Add New Issue</button>
+                <!-- The Modal -->
+                <div id="issue_module" class="modal">
+                    <!-- Modal content -->
+                    <div class="issue-content">
+                        <?php include 'modal/issue_modal.php';?>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-8'>
+                <!-- Show Issues -->
+                <?= $get_api_class_data; ?>
+            </div>
+        </div>
+        <script>
+            <?php #include script file for modal
+                include 'script/modal_script.js'
+            ?>
+        </script>
+    </body>
+</html>
